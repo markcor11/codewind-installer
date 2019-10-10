@@ -85,6 +85,33 @@ func Test_CreateNewDeployment(t *testing.T) {
 	})
 }
 
+// Test_CreateNewDeployment :  Adds a new deployment to the list called remoteserver
+func Test_GetDeploymentByID(t *testing.T) {
+	t.Run("Get Deployment by id: local", func(t *testing.T) {
+		result, err := getDeploymentByID("local")
+		if err != nil {
+			t.Fail()
+		}
+		assert.Equal(t, "local", result.ID)
+		assert.Equal(t, "Codewind local deployment", result.Label)
+	})
+	t.Run("Get Deployment by id: remoteserver", func(t *testing.T) {
+		result, err := getDeploymentByID("remoteserver")
+		if err != nil {
+			t.Fail()
+		}
+		assert.Equal(t, "remoteserver", result.ID)
+		assert.Equal(t, "MyRemoteServer", result.Label)
+	})
+	t.Run("Get deployment with an invalid ID returns an error", func(t *testing.T) {
+		_, err := getDeploymentByID("this-is-an-invalid-id")
+		if err == nil {
+			t.Fail()
+		}
+		assert.Equal(t, "dep_not_found", err.Op)
+	})
+}
+
 // Test_SwitchTarget : Switches the target from one deployment to one called remoteserver
 func Test_SwitchTarget(t *testing.T) {
 	set := flag.NewFlagSet("tests", 0)

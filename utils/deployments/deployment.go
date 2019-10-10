@@ -240,13 +240,13 @@ func GetTargetDeployment() (*Deployment, *DepError) {
 }
 
 // GetAllDeployments : Retrieve all saved deployments
-func GetAllDeployments() (*DeploymentConfig, *DepError) {
+func GetAllDeployments() ([]Deployment, *DepError) {
 	deploymentConfig, depErr := GetDeploymentsConfig()
 	if depErr != nil {
 		return nil, depErr
 	}
 	if deploymentConfig != nil && deploymentConfig.Deployments != nil && len(deploymentConfig.Deployments) > 0 {
-		return deploymentConfig, nil
+		return deploymentConfig.Deployments, nil
 	}
 	depError := errors.New("No Deployments found")
 	return nil, &DepError{errOpNotFound, depError, depError.Error()}
@@ -279,6 +279,25 @@ func saveDeploymentsConfigFile(deploymentConfig *DeploymentConfig) *DepError {
 		return &DepError{errOpFileWrite, depErr, depErr.Error()}
 	}
 	return nil
+}
+
+// getDeploymentByID : get a deployment by its ID
+func getDeploymentByID(search string) (*Deployment, *DepError) {
+	if search == "" {
+		depErr := errors.New("Invalid search id")
+		return nil, &DepError{errOpNotFound, depErr, depErr.Error()}
+	}
+	deployments, depErr := GetAllDeployments()
+	if depErr != nil || deployments == nil {
+		return nil, depErr
+	}
+	for i := 0; i < len(deployments); i++ {
+		if deployments[i].ID == search {
+			return &deployments[i], nil
+		}
+	}
+	err := errors.New("Deployment " + search + " not found")
+	return nil, &DepError{errOpNotFound, err, err.Error()}
 }
 
 // getDeploymentConfigDir : get directory path to the deployments file
