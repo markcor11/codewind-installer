@@ -470,7 +470,7 @@ func Commands() {
 					Aliases: []string{"rm"},
 					Usage:   "Remove a deployment from the configuration file",
 					Flags: []cli.Flag{
-						cli.StringFlag{Name: "id", Usage: "The reference ID of the deployment to be removed", Required: true},
+						cli.StringFlag{Name: "id", Usage: "The ID of the deployment to remove", Required: true},
 					},
 					Action: func(c *cli.Context) error {
 						if c.NumFlags() != 1 {
