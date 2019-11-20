@@ -75,6 +75,22 @@ func DeployRemote(remoteDeployOptions *DeployOptions) (*DeploymentResult, *RemIn
 		namespace = kube.GetCurrentNamespace()
 	}
 
+	// Check if namespace exists
+	_, err = clientset.CoreV1().Namespaces().Get(namespace, v1.GetOptions{})
+	if err != nil {
+		logr.Error("Creating requested namespace: %v", namespace)
+
+		// create the namespace
+
+		// insert the namespace
+		requestedNamespace, err := clientset.CoreV1().Namespaces().Create(deploymentNamespace)
+		if err != nil {
+			logr.Error("Unable to create %v namespace: %v", namespace, err)
+			return nil, &RemInstError{errOpCreateNamespace, err, err.Error()}
+		}
+
+	}
+
 	logr.Infof("Using namespace : %v\n", namespace)
 
 	pfeImage, performanceImage, keycloakImage, gatekeeperImage := GetImages()
