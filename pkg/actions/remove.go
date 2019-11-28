@@ -12,10 +12,15 @@
 package actions
 
 import (
+	"crypto/tls"
 	"fmt"
+	"net/http"
+	"os"
 	"strings"
 
+	"github.com/eclipse/codewind-installer/pkg/remote"
 	"github.com/eclipse/codewind-installer/pkg/utils"
+	logr "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
 
@@ -56,4 +61,29 @@ func RemoveCommand(c *cli.Context) {
 			utils.RemoveNetwork(network)
 		}
 	}
+}
+
+// DoRemoteRemove : Delete a remote Codewind deployment
+func DoRemoteRemove(c *cli.Context) {
+
+	// Since remote will always use Self Signed Certificates initally, turn on insecure flag
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	printAsJSON := c.GlobalBool("json")
+
+	removeOptions := remote.RemoveDeploymentOptions{
+		Namespace:   c.String("namespace"),
+		WorkspaceID: c.String("workspace"),
+	}
+
+	_, remInstError := remote.RemoveRemote(&removeOptions)
+	if remInstError != nil {
+		if printAsJSON {
+			fmt.Println(remInstError.Error())
+		} else {
+			logr.Errorf("Error: %v - %v\n", remInstError.Op, remInstError.Desc)
+		}
+		os.Exit(1)
+	}
+
+	os.Exit(0)
 }
