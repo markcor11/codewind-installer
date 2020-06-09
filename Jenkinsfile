@@ -124,7 +124,7 @@ spec:
                 container('go') {
                    sh '''#!/bin/bash
                         export GOPATH=/go:/home/jenkins/agent
-
+                        export GO111MODULE=on
                         # go cache setup
                         mkdir .cache
                         cd .cache
